@@ -2,96 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Widget</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calc</title>
     <style>
-        /* ফিক্সড মোবাইল ভিউপোর্ট এবং মার্জিন গাইডলাইন */
         body {
-            margin: 0;
-            padding: 0;
-            width: 240px; /* QQVGA হলে 128px */
-            height: 320px; /* QQVGA হলে 160px */
-            background-color: #121212;
-            color: #ffffff;
-            font-family: sans-serif; /* ওএস লেভেলে Roboto পেয়ে যাবে */
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            margin: 0; padding: 0;
+            width: 240px; height: 320px;
+            background-color: #121212; color: #ffffff;
+            font-family: sans-serif; overflow: hidden;
+            display: flex; flex-direction: column;
         }
-        /* হেডার গাইডলাইন অনুযায়ী সেন্ট্রাল টেক্সট */
         .header {
-            height: 30px;
-            background-color: #1f1f1f;
-            text-align: center;
-            line-height: 30px;
-            font-size: 14px;
-            font-weight: bold;
+            height: 30px; background-color: #1f1f1f;
+            text-align: center; line-height: 30px; font-size: 14px; font-weight: bold;
+            border-bottom: 1px solid #333;
         }
         .content {
-            flex: 1;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px;
         }
-        /* বাটন বা মেনু আইটেম */
-        .menu-item {
-            padding: 8px;
-            background-color: #2c2c2c;
-            border: 2px solid transparent;
-            text-align: center;
-            border-radius: 4px;
+        .input-group {
+            display: flex; justify-content: space-between; align-items: center; gap: 5px;
         }
-        /* UI নির্দেশিকা অনুযায়ী ফোকাসড বাটন হাইলাইট */
-        .menu-item.focused {
-            border-color: #00ff00;
-            background-color: #3d3d3d;
+        label { font-size: 11px; color: #bbb; width: 60px; }
+        /* কিপ্যাড ফ্রেন্ডলি ইনপুট ও বাটন */
+        input, button {
+            background-color: #222; color: white;
+            border: 1px solid #444; padding: 5px;
+            border-radius: 4px; font-size: 12px; flex: 1;
         }
-        /* সফটওয়্যার কি বার */
+        button {
+            width: 100%; margin-top: 5px; background-color: #0088cc; border: none; font-weight: bold;
+        }
+        /* ফোকাস বর্ডার গাইডলাইন অনুযায়ী */
+        .focused, input:focus, button:focus {
+            border-color: #00ff00 !important; outline: none; background-color: #2d2d2d;
+        }
+        .result-box {
+            flex: 1; margin-top: 5px; background-color: #1a1a1a;
+            border-radius: 4px; padding: 6px; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+        }
+        .result-title { font-size: 11px; color: #888; }
+        .result-main { font-size: 15px; font-weight: bold; color: #00ff00; }
         .software-keys {
-            height: 25px;
-            background-color: #1f1f1f;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 10px;
-            line-height: 25px;
-            font-size: 11px;
+            height: 22px; background-color: #1f1f1f; font-size: 11px;
+            display: flex; justify-content: space-between; padding: 0 10px; line-height: 22px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">My Widget</div>
+    <div class="header">বয়স ক্যালকুলেটর</div>
 
     <div class="content">
-        <div class="menu-item focused" data-index="0">অপশন ১ (Enter চাপুন)</div>
-        <div class="menu-item" data-index="1">অপশন ২</div>
-        <div class="menu-item" data-index="2">অপশন ৩</div>
+        <!-- জন্ম তারিখ ইনপুট ফর্ম -->
+        <div class="input-group">
+            <label for="day">দিন (DD):</label>
+            <input type="number" id="day" class="focusable" placeholder="Ex: 15" min="1" max="31">
+        </div>
+        <div class="input-group">
+            <label for="month">মাস (MM):</label>
+            <input type="number" id="month" class="focusable" placeholder="Ex: 12" min="1" max="12">
+        </div>
+        <div class="input-group">
+            <label for="year">বছর (YYYY):</label>
+            <input type="number" id="year" class="focusable" placeholder="Ex: 2002">
+        </div>
+
+        <button id="calcBtn" class="focusable">হিসাব করুন (Enter)</button>
+        
+        <!-- ফলাফল দেখানোর জায়গা -->
+        <div class="result-box" id="resultBox">
+            <div class="result-title">আপনার বর্তমান বয়স</div>
+            <div class="result-main" id="resultOutput">-- বছর -- মাস -- দিন</div>
+        </div>
     </div>
 
-    <!-- সফটওয়্যার কি লেবেল -->
     <div class="software-keys">
-        <span class="lsk">LSK: মেনু</span>
-        <span class="rsk">RSK: ব্যাক</span>
+        <span>LSK: অপশন</span>
+        <span>RSK: ব্যাক</span>
     </div>
 
     <script>
-        let currentIndex = 0;
-        const items = document.querySelectorAll('.menu-item');
+        // বয়স হিসাব করার লজিক
+        function calculateAge() {
+            const birthDay = parseInt(document.getElementById('day').value);
+            const birthMonth = parseInt(document.getElementById('month').value);
+            const birthYear = parseInt(document.getElementById('year').value);
 
-        // কিপ্যাড ইভেন্ট হ্যান্ডলার
-        document.addEventListener('keydown', function(e) {
-            items[currentIndex].classList.remove('focused');
-
-            if (e.key === 'ArrowDown') {
-                currentIndex = (currentIndex + 1) % items.length;
-            } else if (e.key === 'ArrowUp') {
-                currentIndex = (currentIndex - 1 + items.length) % items.length;
-            } else if (e.key === 'Enter') {
-                alert(items[currentIndex].innerText + ' সিলেক্ট হয়েছে!');
+            if (!birthDay || !birthMonth || !birthYear) {
+                alert('দয়া করে সবগুলো বক্স সঠিকভাবে পূরণ করুন!');
+                return;
             }
 
-            items[currentIndex].classList.add('focused');
+            const today = new Date();
+            let currentDay = today.getDate();
+            let currentMonth = today.getMonth() + 1; // 0-based index তাই +1
+            let currentYear = today.getFullYear();
+
+            const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            // লিপ ইয়ার চেক
+            if ((currentYear % 4 === 0 && currentYear % 100 !== 0) || (currentYear % 400 === 0)) {
+                monthDays[1] = 29;
+            }
+
+            if (birthDay > currentDay) {
+                currentDay = currentDay + monthDays[currentMonth - 2];
+                currentMonth = currentMonth - 1;
+            }
+            if (birthMonth > currentMonth) {
+                currentMonth = currentMonth + 12;
+                currentYear = currentYear - 1;
+            }
+
+            const calculatedDay = currentDay - birthDay;
+            const calculatedMonth = currentMonth - birthMonth;
+            const calculatedYear = currentYear - birthYear;
+
+            if(calculatedYear < 0) {
+                alert('জন্মসাল বর্তমান সালের চেয়ে বড় হতে পারে না!');
+                return;
+            }
+
+            // স্ক্রিনে রেজাল্ট দেখানো
+            document.getElementById('resultOutput').innerText = 
+                `${calculatedYear} বছর, ${calculatedMonth} মাস, ${calculatedDay} দিন`;
+        }
+
+        // কিপ্যাড নেভিগেশন (Arrow Keys) কন্ট্রোল
+        let focusables = document.querySelectorAll('.focusable');
+        let focusIndex = 0;
+
+        function applyFocus() {
+            focusables.forEach((el, idx) => {
+                if (idx === focusIndex) {
+                    el.classList.add('focused');
+                    el.focus();
+                } else {
+                    el.classList.remove('focused');
+                }
+            });
+        }
+        
+        applyFocus(); // শুরুতে প্রথম ইনপুট ফোকাসড থাকবে
+
+        document.addEventListener('keydown', function(e) {
+            // ইনপুট বক্সে টাইপ করার সময় যেন শুধু Up/Down চাপলে ফোকাস বদলায়
+            if (document.activeElement.tagName === 'INPUT') {
+                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+            }
+
+            if (e.key === 'ArrowDown') {
+                focusIndex = (focusIndex + 1) % focusables.length;
+                applyFocus();
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp') {
+                focusIndex = (focusIndex - 1 + focusables.length) % focusables.length;
+                applyFocus();
+                e.preventDefault();
+            } else if (e.key === 'Enter') {
+                if(focusables[focusIndex].id === 'calcBtn') {
+                    calculateAge();
+                }
+            }
         });
     </script>
 </body>
