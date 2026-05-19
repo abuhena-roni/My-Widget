@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Age Calc</title>
+    <title>Age Calc Live</title>
     <style>
         body {
             margin: 0; padding: 0;
@@ -14,36 +14,39 @@
         }
         .header {
             height: 30px; background-color: #1f1f1f;
-            text-align: center; line-height: 30px; font-size: 14px; font-weight: bold;
+            text-align: center; line-height: 30px; font-size: 13px; font-weight: bold;
             border-bottom: 1px solid #333;
         }
+        /* ঘড়ি ও লাইভ টাইমের স্টাইল */
+        .live-clock {
+            height: 20px; background-color: #1a1a1a; color: #00ff00;
+            text-align: center; line-height: 20px; font-size: 11px;
+            border-bottom: 1px solid #222; font-family: monospace;
+        }
         .content {
-            flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px;
+            flex: 1; padding: 6px; display: flex; flex-direction: column; gap: 5px;
         }
         .input-group {
             display: flex; justify-content: space-between; align-items: center; gap: 5px;
         }
         label { font-size: 11px; color: #bbb; width: 60px; }
-        /* কিপ্যাড ফ্রেন্ডলি ইনপুট ও বাটন */
-        input, button {
+        input {
             background-color: #222; color: white;
-            border: 1px solid #444; padding: 5px;
+            border: 1px solid #444; padding: 4px;
             border-radius: 4px; font-size: 12px; flex: 1;
         }
-        button {
-            width: 100%; margin-top: 5px; background-color: #0088cc; border: none; font-weight: bold;
-        }
-        /* ফোকাস বর্ডার গাইডলাইন অনুযায়ী */
-        .focused, input:focus, button:focus {
+        /* ফোকাস বর্ডার */
+        .focused, input:focus {
             border-color: #00ff00 !important; outline: none; background-color: #2d2d2d;
         }
         .result-box {
-            flex: 1; margin-top: 5px; background-color: #1a1a1a;
+            flex: 1; margin-top: 4px; background-color: #161616;
             border-radius: 4px; padding: 6px; text-align: center;
-            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+            display: flex; flex-direction: column; justify-content: center; gap: 2px;
+            border: 1px solid #222;
         }
         .result-title { font-size: 11px; color: #888; }
-        .result-main { font-size: 15px; font-weight: bold; color: #00ff00; }
+        .result-main { font-size: 13px; font-weight: bold; color: #00ff00; }
         .software-keys {
             height: 22px; background-color: #1f1f1f; font-size: 11px;
             display: flex; justify-content: space-between; padding: 0 10px; line-height: 22px;
@@ -53,9 +56,11 @@
 <body>
 
     <div class="header">বয়স ক্যালকুলেটর</div>
+    
+    <!-- লাইভ টাইম দেখানোর বক্স -->
+    <div class="live-clock" id="clockBox">00:00:00 AM</div>
 
     <div class="content">
-        <!-- জন্ম তারিখ ইনপুট ফর্ম -->
         <div class="input-group">
             <label for="day">দিন (DD):</label>
             <input type="number" id="day" class="focusable" placeholder="Ex: 15" min="1" max="31">
@@ -68,68 +73,97 @@
             <label for="year">বছর (YYYY):</label>
             <input type="number" id="year" class="focusable" placeholder="Ex: 2002">
         </div>
-
-        <button id="calcBtn" class="focusable">হিসাব করুন (Enter)</button>
         
-        <!-- ফলাফল দেখানোর জায়গা -->
-        <div class="result-box" id="resultBox">
-            <div class="result-title">আপনার বর্তমান বয়স</div>
-            <div class="result-main" id="resultOutput">-- বছর -- মাস -- দিন</div>
+        <div class="result-box">
+            <div class="result-title">আপনার বয়স (রিয়েল-টাইম)</div>
+            <div class="result-main" id="resultOutput">ইনপুট দেওয়া শুরু করুন...</div>
         </div>
     </div>
 
     <div class="software-keys">
-        <span>LSK: অপশন</span>
+        <span>LSK: মেনু</span>
         <span>RSK: ব্যাক</span>
     </div>
 
     <script>
-        // বয়স হিসাব করার লজিক
-        function calculateAge() {
-            const birthDay = parseInt(document.getElementById('day').value);
-            const birthMonth = parseInt(document.getElementById('month').value);
-            const birthYear = parseInt(document.getElementById('year').value);
+        // ১. লাইভ ঘড়ি সচল করার লজিক
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 হলে 12 দেখাবে
+            const timeString = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+            
+            document.getElementById('clockBox').innerText = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // শুরুতে একবার কল করা
 
-            if (!birthDay || !birthMonth || !birthYear) {
-                alert('দয়া করে সবগুলো বক্স সঠিকভাবে পূরণ করুন!');
+        // ২. রিয়েল-টাইম বয়স হিসাব (যেকোনো একটা ফিল্ড পূরণ করলেই কাজ করবে)
+        function autoCalculateAge() {
+            // যদি কোনো ফিল্ড খালি থাকে, তবে সেটিকে ডিফল্ট মান হিসেবে আজকের দিন/মাস/সাল ধরে নেবে
+            const today = new Date();
+            const currentDay = today.getDate();
+            const currentMonth = today.getMonth() + 1;
+            const currentYear = today.getFullYear();
+
+            const rawDay = document.getElementById('day').value;
+            const rawMonth = document.getElementById('month').value;
+            const rawYear = document.getElementById('year').value;
+
+            // যেকোনো একটা বক্সে ভ্যালু আছে কিনা চেক
+            if (!rawDay && !rawMonth && !rawYear) {
+                document.getElementById('resultOutput').innerText = "ইনপুট দেওয়া শুরু করুন...";
                 return;
             }
 
-            const today = new Date();
-            let currentDay = today.getDate();
-            let currentMonth = today.getMonth() + 1; // 0-based index তাই +1
-            let currentYear = today.getFullYear();
+            // ফাল ব্যাক (Fallback) লজিক: ইউজার যা খালি রাখবে, সেখানে আজকের ডেট বসে যাবে
+            const birthDay = rawDay ? parseInt(rawDay) : currentDay;
+            const birthMonth = rawMonth ? parseInt(rawMonth) : currentMonth;
+            const birthYear = rawYear ? parseInt(rawYear) : currentYear;
+
+            let calcDay = currentDay;
+            let calcMonth = currentMonth;
+            let calcYear = currentYear;
 
             const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-            // লিপ ইয়ার চেক
-            if ((currentYear % 4 === 0 && currentYear % 100 !== 0) || (currentYear % 400 === 0)) {
+            if ((calcYear % 4 === 0 && calcYear % 100 !== 0) || (calcYear % 400 === 0)) {
                 monthDays[1] = 29;
             }
 
-            if (birthDay > currentDay) {
-                currentDay = currentDay + monthDays[currentMonth - 2];
-                currentMonth = currentMonth - 1;
+            if (birthDay > calcDay) {
+                calcDay = calcDay + monthDays[calcMonth - 2 < 0 ? 11 : calcMonth - 2];
+                calcMonth = calcMonth - 1;
             }
-            if (birthMonth > currentMonth) {
-                currentMonth = currentMonth + 12;
-                currentYear = currentYear - 1;
+            if (birthMonth > calcMonth) {
+                calcMonth = calcMonth + 12;
+                calcYear = calcYear - 1;
             }
 
-            const calculatedDay = currentDay - birthDay;
-            const calculatedMonth = currentMonth - birthMonth;
-            const calculatedYear = currentYear - birthYear;
+            const finalDay = calcDay - birthDay;
+            const finalMonth = calcMonth - birthMonth;
+            const finalYear = calcYear - birthYear;
 
-            if(calculatedYear < 0) {
-                alert('জন্মসাল বর্তমান সালের চেয়ে বড় হতে পারে না!');
+            if (finalYear < 0 || (finalYear === 0 && finalMonth === 0 && finalDay < 0)) {
+                document.getElementById('resultOutput').innerText = "ভুল তারিখ দেওয়া হয়েছে!";
                 return;
             }
 
-            // স্ক্রিনে রেজাল্ট দেখানো
             document.getElementById('resultOutput').innerText = 
-                `${calculatedYear} বছর, ${calculatedMonth} মাস, ${calculatedDay} দিন`;
+                `${finalYear} বছর, ${finalMonth} মাস, ${finalDay} দিন`;
         }
 
-        // কিপ্যাড নেভিগেশন (Arrow Keys) কন্ট্রোল
+        // ইনপুট বক্সগুলোতে ইভেন্ট লিসেনার যোগ করা (টাইপ করার সাথে সাথে রান হবে)
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', autoCalculateAge);
+        });
+
+        // ৩. কিপ্যাড নেভিগেশন (Arrow Keys) কন্ট্রোল
         let focusables = document.querySelectorAll('.focusable');
         let focusIndex = 0;
 
@@ -143,15 +177,9 @@
                 }
             });
         }
-        
-        applyFocus(); // শুরুতে প্রথম ইনপুট ফোকাসড থাকবে
+        applyFocus();
 
         document.addEventListener('keydown', function(e) {
-            // ইনপুট বক্সে টাইপ করার সময় যেন শুধু Up/Down চাপলে ফোকাস বদলায়
-            if (document.activeElement.tagName === 'INPUT') {
-                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-            }
-
             if (e.key === 'ArrowDown') {
                 focusIndex = (focusIndex + 1) % focusables.length;
                 applyFocus();
@@ -160,10 +188,6 @@
                 focusIndex = (focusIndex - 1 + focusables.length) % focusables.length;
                 applyFocus();
                 e.preventDefault();
-            } else if (e.key === 'Enter') {
-                if(focusables[focusIndex].id === 'calcBtn') {
-                    calculateAge();
-                }
             }
         });
     </script>
