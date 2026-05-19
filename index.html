@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Widget</title>
+    <style>
+        /* ফিক্সড মোবাইল ভিউপোর্ট এবং মার্জিন গাইডলাইন */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 240px; /* QQVGA হলে 128px */
+            height: 320px; /* QQVGA হলে 160px */
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif; /* ওএস লেভেলে Roboto পেয়ে যাবে */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* হেডার গাইডলাইন অনুযায়ী সেন্ট্রাল টেক্সট */
+        .header {
+            height: 30px;
+            background-color: #1f1f1f;
+            text-align: center;
+            line-height: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .content {
+            flex: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        /* বাটন বা মেনু আইটেম */
+        .menu-item {
+            padding: 8px;
+            background-color: #2c2c2c;
+            border: 2px solid transparent;
+            text-align: center;
+            border-radius: 4px;
+        }
+        /* UI নির্দেশিকা অনুযায়ী ফোকাসড বাটন হাইলাইট */
+        .menu-item.focused {
+            border-color: #00ff00;
+            background-color: #3d3d3d;
+        }
+        /* সফটওয়্যার কি বার */
+        .software-keys {
+            height: 25px;
+            background-color: #1f1f1f;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            line-height: 25px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">আমার উইজেট</div>
+
+    <div class="content">
+        <div class="menu-item focused" data-index="0">অপশন ১ (Enter চাপুন)</div>
+        <div class="menu-item" data-index="1">অপশন ২</div>
+        <div class="menu-item" data-index="2">অপশন ৩</div>
+    </div>
+
+    <!-- সফটওয়্যার কি লেবেল -->
+    <div class="software-keys">
+        <span class="lsk">LSK: মেনু</span>
+        <span class="rsk">RSK: ব্যাক</span>
+    </div>
+
+    <script>
+        let currentIndex = 0;
+        const items = document.querySelectorAll('.menu-item');
+
+        // কিপ্যাড ইভেন্ট হ্যান্ডলার
+        document.addEventListener('keydown', function(e) {
+            items[currentIndex].classList.remove('focused');
+
+            if (e.key === 'ArrowDown') {
+                currentIndex = (currentIndex + 1) % items.length;
+            } else if (e.key === 'ArrowUp') {
+                currentIndex = (currentIndex - 1 + items.length) % items.length;
+            } else if (e.key === 'Enter') {
+                alert(items[currentIndex].innerText + ' সিলেক্ট হয়েছে!');
+            }
+
+            items[currentIndex].classList.add('focused');
+        });
+    </script>
+</body>
+</html>
